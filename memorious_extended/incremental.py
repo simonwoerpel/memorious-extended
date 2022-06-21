@@ -1,6 +1,6 @@
 import re
 
-from banal import ensure_dict
+from banal import ensure_dict, ensure_list
 from memorious import settings
 from servicelayer import env
 from servicelayer.cache import make_key
@@ -38,19 +38,30 @@ def should_skip_incremental(context, data, config=None):
 
     config = ensure_dict(config or context.params.get("skip_incremental"))
     get_key = ensure_dict(config.get("key"))
-    identifier = data.get(get_key.get("data", "url"))
+    identifier = None
+
+    for key in ensure_list(get_key.get("data")):
+        if key in data:
+            identifier = data[key]
+            break
+
     if identifier is None:
         urlpattern = get_key.get("urlpattern")
         if urlpattern is not None:
             url = data.get("url", "")
             if re.match(urlpattern, url):
                 identifier = url
+
     if identifier is None:
         xpath = get_key.get("xpath")
         if xpath is not None:
             res = context.http.rehash(data)
             if hasattr(res, "html"):
                 identifier = x(xpath, res.html)
+
+    if identifier is None:
+        # default: url
+        identifier = data.get("url")
 
     if identifier is not None:
         target = config.get("target", "store")
@@ -61,7 +72,7 @@ def should_skip_incremental(context, data, config=None):
         if context.check_tag(target_key):
             # we reached the target
             if settings.INCREMENTAL and SKIP_INCREMENTAL:
-                context.log.debug("Skipping: %s" % target_key)
+                context.log.info("Skipping: %s" % target_key)
                 return True
 
 

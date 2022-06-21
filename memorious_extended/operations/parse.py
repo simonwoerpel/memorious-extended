@@ -1,7 +1,8 @@
+import csv
 from urllib.parse import urljoin
 
 import jq
-from banal import clean_dict
+from banal import clean_dict, ensure_dict
 from memorious.helpers.rule import Rule
 from memorious.operations.parse import URL_TAGS
 from memorious.operations.parse import parse_for_metadata as memorious_parse_meta
@@ -147,3 +148,24 @@ def _parse_html_part(context, data, html):
 
                 context.http.session.headers["Referer"] = url
                 context.emit(rule="fetch", data=data)
+
+
+def parse_csv(context, data):
+    res = context.http.rehash(data)
+    parserkwargs = ensure_dict(context.params)
+    skiprows = parserkwargs.pop("skiprows", 0)
+    reader = csv.DictReader(open(res.file_path), **parserkwargs)
+    rows = []
+    for i in range(skiprows):
+        next(reader)
+    for row in reader:
+        context.emit("row", data=row, optional=True)
+        rows.append(row)
+    context.emit("rows", data={**data, **{"rows": rows}})
+
+
+def parse_xml(context, data):
+    res = context.http.rehash(data)
+    if res.xml is not None:
+        memorious_parse_meta(context, data, res.xml)
+    context.emit(data=data)
