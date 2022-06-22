@@ -28,12 +28,12 @@ def should_skip_incremental(context, data, config=None):
             data: ... (default: url)
             xpath: ...
             urlpattern: ...
-        target:
+        target: # optional, see default:
             store (name of target stage, default "store")
 
     (can also be passed in as dict for config parameter)
     """
-    if config is None and "skip_incremental" not in context.params:
+    if config is None and not context.params.get("skip_incremental"):
         return False
 
     config = ensure_dict(config or context.params.get("skip_incremental"))

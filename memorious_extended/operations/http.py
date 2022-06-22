@@ -92,7 +92,9 @@ def fetch(context, data):
         elif "url" in data:
             url = furl(data["url"]).join(f).url
 
-    if not skip_incremental(context, data):
+    if not skip_incremental(
+        context, data, current_stage_test_runs=context.params.get("test_runs", 1)
+    ):
         # do the actual fetch operation
         data["url"] = url
         memorious_fetch(context, data)
