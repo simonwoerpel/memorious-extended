@@ -1,6 +1,6 @@
 import re
 
-from banal import ensure_dict, ensure_list, is_mapping
+from banal import ensure_dict, ensure_list, is_mapping, clean_dict
 
 
 def _extract_regex_groups(key, value, patterns, log):
@@ -14,7 +14,7 @@ def _extract_regex_groups(key, value, patterns, log):
         pattern = re.compile(pattern)  # yaml escaping & stuff
         m = re.match(pattern, value)
         if m is not None:
-            return m.groupdict()
+            return {k: v.strip() for k, v in clean_dict(m.groupdict().items())}
         if m is None:
             log("Can't extract data for `%s`: [%s] %s" % (key, pattern.pattern, value))
     return {}
