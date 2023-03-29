@@ -126,6 +126,7 @@ def skip_incremental(
 
         # track recursion
         recursion = data.get(f"{context.stage}_recursion", 0)
+        test_loops = context.get("test_loops", test_loops)
         if (test_loops is not None and recursion < test_loops) or test_loops is None:
             recursion += 1
         data[f"{context.stage}_recursion"] = recursion
