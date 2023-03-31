@@ -1,6 +1,7 @@
 from importlib import import_module
-from servicelayer.extensions import get_entry_point
+
 from banal import ensure_dict
+from servicelayer.extensions import get_entry_point
 
 from ..incremental import skip_incremental
 
@@ -22,8 +23,8 @@ def store(context, data):
     """
     an extended store to be able to set skip_incremental
     """
-    method = _get_method(context.params.get("operation", "directory"))
-    method(context, data)
+    handler = _get_method(context.params.get("operation", "directory"))
+    handler(context, data)
     incremental = ensure_dict(data.get("skip_incremental"))
     if incremental.get("target") == context.stage.name:
         if incremental.get("key") is not None:

@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name="memorious-extended",
@@ -18,7 +18,7 @@ setup(
     packages=find_packages(exclude=["ez_setup", "tests"]),
     namespace_packages=[],
     zip_safe=False,
-    install_requires=["memorious", "furl", "jq", "ipdb", "jinja2"],
+    install_requires=["memorious", "furl", "jq", "ipdb", "jinja2", "zavod"],
     entry_points={
         # "console_scripts": ["memorious = memorious.cli:main"],
         # "memorious_extended.operations": [
